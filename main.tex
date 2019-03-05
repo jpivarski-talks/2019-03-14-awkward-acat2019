@@ -347,38 +347,69 @@
 %% \end{columns}
 %% \end{frame}
 
-\begin{frame}[fragile]{Feedback from physicists}
-\vspace{0.5 cm}\large
-\begin{itemize}\setlength{\itemsep}{0.3 cm}
-\item<1-> Many bug-fixes, of course.
-\item<2-> Need to unlearn order-driven coding habits:
+%% \begin{frame}[fragile]{Feedback from physicists}
+%% \vspace{0.5 cm}\large
+%% \begin{itemize}\setlength{\itemsep}{0.3 cm}
+%% \item<1-> Many bug-fixes, of course.
+%% \item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
+%% \item<3-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
+%% \item<4-> Discovering which operations are frequently used in analysis, which aren't.
+%% \item<5-> Need to unlearn order-dependent coding habits:
 
-\small\begin{minted}{python}
-(nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
-\end{minted}
-\large
+%% \small\begin{minted}{python}
+%% (nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
+%% \end{minted}
+%% \large
 
-may try to evaluate the first muon from an event with zero muons.
+%% may try to evaluate the first muon from an event with zero muons.
+
+%% \vspace{0.25 cm}
+%% \begin{uncoverenv}<6->
+%% Instead,
+
+%% \small\begin{minted}{python}
+%% Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
+%% \end{minted}
+%% \end{uncoverenv}
+%% \end{itemize}
+%% \end{frame}
+
+\begin{frame}{Syntax is an extension of Numpy}
+\vspace{0.5 cm}
+Numpy arrays must all be rectangular: vectors, matrices, and tensors.
 
 \vspace{0.25 cm}
-\begin{uncoverenv}<3->
-Instead,
+Awkward arrays reproduce this behavior in rectangular cases and generalize in jagged cases. For example:
+\begin{itemize}
+\item 
 
-\small\begin{minted}{python}
-Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
-\end{minted}
-\end{uncoverenv}
-\large
 
-\item<4-> {\tt\small argmin()} was a bottleneck. Reimplemented to be 125$\times$ faster.
 
-\item<5-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
-
-\item<6-> Discovering which operations are frequently used in analysis, which aren't.
 \end{itemize}
 \end{frame}
 
 
 
 
+
 \end{document}
+
+%% \begin{frame}[fragile]{Common pattern: expand-compute-reduce}
+%% \vspace{0.5 cm}
+
+
+%% Isolating jets from electrons:
+%% \begin{enumerate}
+%% \item consider all jet-electron pairs
+%% \item determine if $\Delta R$ is too small for each
+%% \item reduce by 
+%% \end{enumerate}
+
+%% \small\begin{minted}{python}
+%% pairs = jets.cross(electrons, nested=True)
+%% jets[~(delta_r(pairs.i0, pairs.i1) < 0.5).any()]
+%% \end{minted}
+%% \normalsize
+
+%% ``Take the {\tt \small jets} for which not ({\tt \small \textasciitilde}) any have $\Delta R < 0.5$ with {\tt \small electrons}.''
+%% \end{frame}
