@@ -347,8 +347,35 @@
 %% \end{columns}
 %% \end{frame}
 
-\begin{frame}{}
+\begin{frame}[fragile]{Feedback from physicists}
+\vspace{0.5 cm}\large
+\begin{itemize}\setlength{\itemsep}{0.3 cm}
+\item<1-> Many bug-fixes, of course.
+\item<2-> Need to unlearn order-driven coding habits:
 
+\small\begin{minted}{python}
+(nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
+\end{minted}
+\large
+
+may try to evaluate the first muon from an event with zero muons.
+
+\vspace{0.25 cm}
+\begin{uncoverenv}<3->
+Instead,
+
+\small\begin{minted}{python}
+Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
+\end{minted}
+\end{uncoverenv}
+\large
+
+\item<4-> {\tt\small argmin()} was a bottleneck. Reimplemented to be 125$\times$ faster.
+
+\item<5-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
+
+\item<6-> Discovering which operations are frequently used in analysis, which aren't.
+\end{itemize}
 \end{frame}
 
 
