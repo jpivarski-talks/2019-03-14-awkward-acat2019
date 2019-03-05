@@ -28,7 +28,9 @@
 \xdefinecolor{darkgreen}{rgb}{0,0.5,0}
 \xdefinecolor{darkgrey}{rgb}{0.35,0.35,0.35}
 \xdefinecolor{darkorange}{rgb}{0.8,0.5,0}
+\xdefinecolor{darkorange2}{rgb}{1,0.5,0}
 \xdefinecolor{darkred}{rgb}{0.7,0,0}
+\xdefinecolor{darkpink}{rgb}{0.9,0.2,0.6}
 \definecolor{darkgreen}{rgb}{0,0.6,0}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
@@ -188,41 +190,60 @@
 %% \end{columns}
 %% \end{frame}
 
-\begin{frame}[fragile]{Not lacking for data types}
+%% \begin{frame}[fragile]{Not lacking for data types}
+%% \vspace{0.5 cm}
+%% Nullable, heterogeneous, multiple levels of depth, nested records\ldots
+
+%% \small
+%% \begin{minted}{python}
+%% >>> import awkward
+%% >>> array = awkward.fromiter(
+%% ...     [[1.1, 2.2, None, 3.3, None],
+%% ...      [4.4, [5.5]],
+%% ...      [{"x": 6, "y": {"z": 7}}, None, {"x": 8, "y": {"z": 9}}]])
+%% \end{minted}
+
+%% \begin{uncoverenv}<2->
+%% \begin{minted}{python}
+%% >>> print(array)            # internally, these are all arrays
+%% [[1.1 2.2 None 3.3 None] [4.4 [5.5]] [<Row 0> None <Row 1>]]
+%% \end{minted}
+%% \end{uncoverenv}
+
+%% \begin{uncoverenv}<3->
+%% \begin{minted}{python}
+%% >>> print(array[:, -2:])    # for all outer list, last two of inner
+%% [[3.3 None] [4.4 [5.5]] [None <Row 1>]]
+%% \end{minted}
+%% \end{uncoverenv}
+
+%% \begin{uncoverenv}<4->
+%% \begin{minted}{python}
+%% >>> (array + 100).tolist()  # element-wise function applied to arrays
+%% [[101.1, 102.2, None, 103.3, None],
+%%  [104.4, [105.5]],
+%%  [{'x': 106, 'y': {'z': 107}}, None, {'x': 108, 'y': {'z': 109}}]]
+%% \end{minted}
+%% \end{uncoverenv}
+%% \end{frame}
+
+%% \begin{frame}{Columnar data structures minimize memory use and time}
+%% \vspace{0.5 cm}
+%% One operation, deriving $p_z$ of a variable number of $p_T$ and $\eta$ per event, using \textcolor{darkorange2}{awkward-array}, \textcolor{blue}{ROOT}, \textcolor{darkpink}{pure Python}, and \textcolor{darkgreen}{root\_numpy}.
+
+%% \vspace{0.2 cm}
+%% \begin{center}
+%% \includegraphics[width=0.9\linewidth]{logscales.pdf}
+%% \end{center}
+%% \end{frame}
+
+\begin{frame}{Real life}
 \vspace{0.5 cm}
-Nullable, heterogeneous, multiple levels of depth, nested records\ldots
 
-\small
-\begin{minted}{python}
->>> import awkward
->>> array = awkward.fromiter(
-...     [[1.1, 2.2, None, 3.3, None],
-...      [4.4, [5.5]],
-...      [{"x": 6, "y": {"z": 7}}, None, {"x": 8, "y": {"z": 9}}]])
-\end{minted}
 
-\begin{uncoverenv}<2->
-\begin{minted}{python}
->>> print(array)            # internally, these are all arrays
-[[1.1 2.2 None 3.3 None] [4.4 [5.5]] [<Row 0> None <Row 1>]]
-\end{minted}
-\end{uncoverenv}
 
-\begin{uncoverenv}<3->
-\begin{minted}{python}
->>> print(array[:, -2:])    # for all outer list, last two of inner
-[[3.3 None] [4.4 [5.5]] [None <Row 1>]]
-\end{minted}
-\end{uncoverenv}
 
-\begin{uncoverenv}<4->
-\begin{minted}{python}
->>> (array + 100).tolist()  # element-wise function applied to arrays
-[[101.1, 102.2, None, 103.3, None],
- [104.4, [105.5]],
- [{'x': 106, 'y': {'z': 107}}, None, {'x': 108, 'y': {'z': 109}}]]
-\end{minted}
-\end{uncoverenv}
+
 \end{frame}
 
 
