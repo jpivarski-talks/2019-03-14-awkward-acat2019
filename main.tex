@@ -32,10 +32,10 @@
 \definecolor{darkgreen}{rgb}{0,0.6,0}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\title[yyyy-mm-dd-DESCRIPTION]{TITLE}
+\title[2019-03-14-awkward-acat2019]{Nested data structures in array and SIMD frameworks}
 \author{Jim Pivarski}
-\institute{Princeton University -- DIANA-HEP}
-\date{MONTH DAY, YEAR}
+\institute{Princeton University -- DIANA-HEP, IRIS-HEP}
+\date{March 14, 2019}
 
 \usetikzlibrary{shapes.callouts}
 
@@ -56,9 +56,110 @@
 
 % START START START START START START START START START START START START START
 
-\begin{frame}{First slide}
+%% \begin{frame}[fragile]{Nested, variable-sized data structures are crucial in HEP}
+%% \vspace{0.5 cm}
+%% \begin{columns}
+%% \column{0.5\linewidth}
+%% \includegraphics[width=\linewidth]{muons-as-objects.png}
+
+%% \column{0.5\linewidth}
+%% \includegraphics[width=\linewidth]{muons-as-a-table.png}
+%% \end{columns}
+
+%% \begin{uncoverenv}<2>
+%% \vspace{0.4 cm}
+%% Most of our analysis data are big lists of variable-length lists of structs/objects/records.
+
+%% \vspace{0.25 cm}
+%% \scriptsize
+%% \begin{Verbatim}[commandchars=\\\{\}]
+%% [[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+%%  [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+%%  [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+%%  [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+%%  ...
+%% \end{Verbatim}
+%% \end{uncoverenv}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Columnar representation}
+%% \vspace{0.5 cm}
+
+%% But they don't have to be ``structs,'' pointers to contiguous $p_T$, $\eta$, $\phi$ triples.
+
+%% \scriptsize
+%% \begin{Verbatim}[commandchars=\\\{\}]
+%% [[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+%%  [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+%%  [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+%%  [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+%%  ...
+%% \end{Verbatim}
+%% \normalsize
+
+%% \vspace{0.5 cm}
+%% They can be contiguous by field with offsets or starts/stops or counts or parents or\ldots
+
+%% \vspace{0.25 cm}
+%% \begin{tabular}{r l}
+%% \only<1>{\small offsets &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ \ 7} \\}
+%% \only<3>{\small parents &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 1,\ \ \ \ \ \ 2,\ \ \ \ \ \ 3,\ \ \ \ \ 3} \\}
+%% \only<2>{\small starts  &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\}
+%% \uncover<2>{\small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\}
+%% \small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+%% \small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+%% \small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+%% \end{tabular}
+%% \end{frame}
+
+\begin{frame}[fragile]{This allows for efficient ways of {\it manipulating} data}
+\vspace{0.25 cm}
+
+``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ rewrite all inner lists.}}
+
+\scriptsize
+\begin{onlyenv}<1>
+\begin{Verbatim}[commandchars=\\\{\}]
+[[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+ [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+ [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\end{onlyenv}\begin{onlyenv}<2->
+\begin{Verbatim}[commandchars=\\\{\}]
+[[     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     }   Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{     }  \textcolor{blue}{      } ],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     } ],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{      }   Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\end{onlyenv}
+\normalsize
+
 \vspace{0.5 cm}
-HERE
+``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ increase all starts by 1.}}
+
+\vspace{0.25 cm}
+\begin{onlyenv}<1>
+\begin{tabular}{r l}
+\small starts  &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\
+\small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
+\small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+\small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+\small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+\end{tabular}
+\end{onlyenv}\begin{onlyenv}<2->
+\begin{tabular}{r l}
+\small starts  &     \textcolor{red}{\tt\scriptsize \ \ \ \ \ 1,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ } \\
+\small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
+\small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+\small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+\small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+\end{tabular}\end{onlyenv}
+
+\vspace{0.5 cm}
+\uncover<3>{We didn't need to touch any contents (read them from disk, decompress them\ldots).}
 \end{frame}
 
 \end{document}
