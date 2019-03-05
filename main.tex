@@ -246,7 +246,7 @@
 %% \end{frame}
 
 \begin{frame}{Real analyses using columnar tools}
-\vspace{0.75 cm}
+\vspace{0.5 cm}
 \begin{columns}
 \column{0.2\linewidth}
 \includegraphics[width=\linewidth]{coffea-logo.png}
@@ -261,16 +261,46 @@
 \normalsize Matteo~Cremonesi, Lindsey~Gray, Oliver~Gutsche, Allison~Hall, Bo~Jayatilaka, Igor~Mandrichenko, Kevin~Pedro, Nick~Smith~[FNAL], and~me~[Princeton] \hfill \textcolor{blue}{\url{github.com/CoffeaTeam}}
 \end{columns}
 
-\vspace{0.25 cm}
 \begin{center}
 \begin{minipage}{0.65\linewidth}
-\Large Performing two complete CMS analyses:
+\large Performing two complete CMS analyses:
 \begin{itemize}
 \item Dark Higgs search
 \item Boosted SM $H \to b\bar{b}$
 \end{itemize}
 \end{minipage}
 \end{center}
+
+\vspace{0.25 cm}
+Also developing {\tt fnal-column-analysis-tools}, a HEP layer on awkward-array,
+and with Ben Galewsky, Mark Neubauer [Illinois], Andrew Melo [Vanderbilt], a distributed query processing system.
+\end{frame}
+
+\begin{frame}{First finished analysis: $Z$ peak}
+\vspace{0.5 cm}
+$Z$ peak is the ``hello world'' of analysis frameworks.
+
+\vspace{0.25 cm}
+This implementation is realistic: run/lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook.
+
+\vspace{0.5 cm}
+\textcolor{blue}{\small \url{github.com/nsmith-/coffea/blob/master/notebooks/zpeak.ipynb}}
+
+\vspace{0.5 cm}
+\begin{columns}[b]
+\column{0.4\linewidth}
+\large
+\begin{description}
+\item[columnar analysis:] \hfill \mbox{\hspace{-1 cm}8~$\mu$s/event/thread (125~kHz)}
+\item[ROOT C++:] \hfill \mbox{\hspace{-1 cm}5.3~$\mu$s/event/thread (190~kHz)}
+\end{description}
+
+\vspace{0.25 cm}
+Columnar analysis is about 50\% slower than its C++ equivalent.
+
+\column{0.4\linewidth}
+\includegraphics[width=\linewidth]{zpeak-performance-breakdown.png}
+\end{columns}
 \end{frame}
 
 
