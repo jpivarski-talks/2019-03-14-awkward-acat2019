@@ -247,7 +247,7 @@ a single operation $\ne$ a physics analysis
 \end{center}
 \end{frame}
 
-\begin{frame}{Performing complete analyses with columnar tools}
+\begin{frame}{Beyond toy studies}
 \vspace{0.5 cm}
 \begin{columns}
 \column{0.2\linewidth}
@@ -264,8 +264,8 @@ a single operation $\ne$ a physics analysis
 \end{columns}
 
 \begin{center}
-\begin{minipage}{0.65\linewidth}
-\large Performing two complete CMS analyses:
+\begin{minipage}{0.8\linewidth}
+\large Performing two complete CMS analyses with columnar tools:
 \begin{itemize}
 \item Dark Higgs search
 \item Boosted SM $H \to b\bar{b}$
@@ -322,9 +322,12 @@ Columnar analysis is about 50\% slower than its C++ equivalent.
 \vspace{0.25 cm}
 70~$\mu$s/event/thread (14~kHz)
 
+\vspace{0.25 cm}
+Uses about 100 columns.
+
 \column{0.6\linewidth}
 \begin{uncoverenv}<2->
-Example of combinatorics: gen-reco matching
+\textcolor{darkblue}{\hspace{-0.15 cm}Example of combinatorics: gen-reco matching}
 
 \small
 \begin{minted}{python}
@@ -449,9 +452,9 @@ array([90.22779777, 74.74654928, ..., 85.44384208, 75.96066262])
 \begin{itemize}\setlength{\itemsep}{0.3 cm}
 \item<1-> Many bug-fixes, of course.
 \item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
-\item<3-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
+\item<3-> A lot of time spent in validity checks (e.g.\ ensure that {\tt \small starts} are all within {\tt \small content}). Need to avoid redundant checks without removing safety.
 \item<4-> Discovering which operations are frequently used in analysis, which aren't.
-\item<5-> Interesting mistake: need to unlearn order-dependent coding habits
+\item<5-> Interesting mistake: need to unlearn order-dependent coding habits.
 
 \small\begin{minted}{python}
 (nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
@@ -491,7 +494,7 @@ Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
 
 \vspace{1.5 cm}
 \begin{center}
-\LARGE SOME QUOTES HERE
+\LARGE QUOTES OR CONCLUSIONS HERE
 \end{center}
 \end{frame}
 
@@ -513,7 +516,7 @@ This will permit compiled (fast), imperative (for-loop style) calculations in Py
 \textcolor{darkblue}{Goal:} single codebase that is efficient on CPUs and GPUs.
 
 \vspace{0.1 cm}
-\textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from {\tt \small import numpy as np} $\to$ {\tt \small import cupy as np}.
+\textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from ``{\tt \small import numpy as np}'' $\to$ ``{\tt \small import cupy as np}.''
 
 Reimplemented in C++ using xtensor (Numpy clone for C++).
 \end{itemize}
