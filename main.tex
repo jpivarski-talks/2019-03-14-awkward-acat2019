@@ -167,13 +167,13 @@ They can be contiguous by field with \only<1>{\textcolor{red}{counts}}\only<2,3,
 \end{frame}
 
 \begin{frame}{Library for manipulating non-standard array types}
-\vspace{0.5 cm}
+\vspace{0.25 cm}
 \begin{columns}
 \column{0.45\linewidth}
 \includegraphics[width=\linewidth]{awkward-logo.pdf}
 
 \vspace{0.25 cm}
-\hfill \scriptsize \textcolor{darkblue}{\url{github.com/scikit-hep/awkward-array}}
+\hfill \scriptsize \textcolor{darkblue}{\mbox{\hspace{-0.75 cm}\url{https://github.com/scikit-hep/awkward-array}\hspace{-0.65 cm}}}
 
 \column{0.55\linewidth}
 \vspace{0.5 cm}
@@ -260,7 +260,7 @@ a single operation $\ne$ a physics analysis
 \large {\bf C}olumnar {\bf O}bject {\bf F}ramework {\bf F}or {\bf E}fficient {\bf A}nalysis
 
 \vspace{0.25 cm}
-\normalsize Matteo~Cremonesi, Lindsey~Gray, Oliver~Gutsche, Allison~Hall, Bo~Jayatilaka, Igor~Mandrichenko, Kevin~Pedro, Nick~Smith~[FNAL], and~me~[Princeton] \hfill \textcolor{blue}{\url{github.com/CoffeaTeam}}
+\normalsize Matteo~Cremonesi, Lindsey~Gray, Oliver~Gutsche, Allison~Hall, Bo~Jayatilaka, Igor~Mandrichenko, Kevin~Pedro, Nick~Smith~[FNAL], and~me~[Princeton] \hfill \textcolor{blue}{\url{https://github.com/CoffeaTeam}}
 \end{columns}
 
 \begin{center}
@@ -283,18 +283,18 @@ and a distributed query processing system with Ben Galewsky, Mark Neubauer [Illi
 $Z$ peak is the ``hello world'' of analysis frameworks.
 
 \vspace{0.25 cm}
-\textcolor{darkblue}{This implementation is realistic:} run/lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook.
+\textcolor{darkblue}{This implementation is realistic:} run-lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook, accessing 25 columns.
 
 \vspace{0.5 cm}
-\textcolor{blue}{\small \url{github.com/nsmith-/coffea/blob/master/notebooks/zpeak.ipynb}}
+\textcolor{blue}{\small \mbox{\url{https://github.com/nsmith-/coffea/blob/master/notebooks/zpeak.ipynb}\hspace{-0.5 cm}}}
 
-\vspace{0.5 cm}
-\begin{columns}[b]
+\vspace{0.25 cm}
+\begin{columns}
 \column{0.4\linewidth}
 \large
 \begin{description}
-\item[columnar analysis:] \hfill \mbox{\hspace{-1 cm}7~$\mu$s/event/thread (140~kHz)}
-\item[ROOT C++:] \hfill \mbox{\hspace{-1 cm}4.6~$\mu$s/event/thread (210~kHz)}
+\item[columnar analysis:] \hfill \mbox{\hspace{-1 cm}6~$\mu$s/event/thread (165~kHz)}
+\item[ROOT C++:] \hfill \mbox{\hspace{-1 cm}4~$\mu$s/event/thread (250~kHz)}
 \end{description}
 
 \vspace{0.25 cm}
@@ -324,6 +324,9 @@ Columnar analysis is about 50\% slower than its C++ equivalent.
 
 \vspace{0.25 cm}
 Uses about 100 columns.
+
+\vspace{0.25 cm}
+\textcolor{blue}{\small \url{https://github.com/lgray/dazsle-hbb-columnar/blob/master/hbb_local_npz_multi.ipynb}}
 
 \column{0.6\linewidth}
 \begin{uncoverenv}<2->
