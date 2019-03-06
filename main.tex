@@ -516,14 +516,27 @@ This will permit compiled (fast), imperative (for-loop style) calculations in Py
 \textcolor{darkblue}{Goal:} single codebase that is efficient on CPUs and GPUs.
 
 \vspace{0.1 cm}
-\textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from ``{\tt \small import numpy as np}'' $\to$ ``{\tt \small import cupy as np}.''
+\textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from ``{\tt \small import numpy as np}'' $\to$ ``{\tt \small import cupy as np}''.
 
 Reimplemented in C++ using xtensor (Numpy clone for C++).
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Conclusions}
+\large
+\vspace{0.5 cm}
+Awkward-array is a library for complex data, presented as arrays. Jagged arrays are the most important for HEP. (Perhaps the only type {\it necessary} for HEP?)
 
+\vspace{0.5 cm}
+We're beyond single-operation tests; we're implementing complete analyses.
+
+Performance is within a factor of two of C++, and there's low-hanging fruit for improvements.
+
+\vspace{0.5 cm}
+Physicists' impressions\ldots
+
+\vspace{0.5 cm}
+This is an open area of development with many paths to follow!
 \end{frame}
 
 \end{document}
