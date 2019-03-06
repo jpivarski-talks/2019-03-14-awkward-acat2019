@@ -22,6 +22,7 @@
 \usepackage{minted}
 \usepackage[thicklines]{cancel}
 \usepackage{fancyvrb}
+\usepackage{tabto}
 
 \xdefinecolor{dianablue}{rgb}{0.18,0.24,0.31}
 \xdefinecolor{darkblue}{rgb}{0.1,0.1,0.7}
@@ -58,339 +59,469 @@
 
 % START START START START START START START START START START START START START
 
-%% \begin{frame}[fragile]{Nested, variable-sized data structures are crucial in HEP}
-%% \vspace{0.25 cm}
-%% \begin{columns}
-%% \column{0.5\linewidth}
-%% \includegraphics[width=\linewidth]{muons-as-objects.png}
+\begin{frame}[fragile]{Nested, variable-sized data structures are crucial in HEP}
+\vspace{0.25 cm}
+\begin{columns}
+\column{0.5\linewidth}
+\includegraphics[width=\linewidth]{muons-as-objects.png}
 
-%% \column{0.5\linewidth}
-%% \includegraphics[width=\linewidth]{muons-as-a-table.png}
-%% \end{columns}
+\column{0.5\linewidth}
+\includegraphics[width=\linewidth]{muons-as-a-table.png}
+\end{columns}
 
-%% \begin{uncoverenv}<2>
-%% \vspace{0.25 cm}
-%% Analysis datasets are big lists of variable-length lists of structs/objects/records.
-
-%% \vspace{0.25 cm}
-%% \scriptsize
-%% \begin{Verbatim}[commandchars=\\\{\}]
-%% [[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
-%%  [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
-%%  [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
-%%  [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
-%%  ...
-%% \end{Verbatim}
-%% \end{uncoverenv}
-%% \end{frame}
-
-%% \begin{frame}[fragile]{Columnar representation}
-%% \vspace{0.5 cm}
-
-%% But they don't have to be ``structs,'' pointers to contiguous $p_T$, $\eta$, $\phi$ triples.
-
-%% \scriptsize
-%% \begin{Verbatim}[commandchars=\\\{\}]
-%% [[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
-%%  [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
-%%  [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
-%%  [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
-%%  ...
-%% \end{Verbatim}
-%% \normalsize
-
-%% \vspace{0.5 cm}
-%% They can be contiguous by field with \only<1>{\textcolor{red}{offsets}}\only<2,3,4>{offsets} or \only<2>{\textcolor{red}{starts/stops}}\only<1,3,4>{starts/stops} or \only<3>{\textcolor{red}{counts}}\only<1,2,4>{counts} or \only<4>{\textcolor{red}{parents}}\only<1,2,3>{parents} arrays.
-
-%% \vspace{0.25 cm}
-%% \begin{tabular}{r l}
-%% \only<1>{\small \textcolor{red}{offsets} & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ \ 7} \\}
-%% \only<3>{\small \textcolor{red}{counts}  & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,\ \ \ \ \ \ 1,\ \ \ \ \ \ 2\ \ \ \ \ \ \ \ \ } \\}
-%% \only<4>{\small \textcolor{red}{parents} & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 1,\ \ \ \ \ \ 2,\ \ \ \ \ \ 3,\ \ \ \ \ 3} \\}
-%% \only<2>{\small \textcolor{red}{starts}  & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\}
-%% \uncover<2>{\small \textcolor{red}{stops}   & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\}
-%% \small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
-%% \small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
-%% \small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
-%% \end{tabular}
-%% \end{frame}
-
-%% \begin{frame}[fragile]{This allows for efficient ways of {\it manipulating} data}
-%% \vspace{0.25 cm}
-
-%% ``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ rewrite all inner lists.}}
-
-%% \scriptsize
-%% \begin{onlyenv}<1>
-%% \begin{Verbatim}[commandchars=\\\{\}]
-%% [[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
-%%  [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
-%%  [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
-%%  [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
-%%  ...
-%% \end{Verbatim}
-%% \end{onlyenv}\begin{onlyenv}<2->
-%% \begin{Verbatim}[commandchars=\\\{\}]
-%% [[     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     }   Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
-%%  [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{     }  \textcolor{blue}{      } ],
-%%  [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     } ],
-%%  [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{      }   Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
-%%  ...
-%% \end{Verbatim}
-%% \end{onlyenv}
-%% \normalsize
-
-%% \vspace{0.5 cm}
-%% ``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ increase all starts by 1.}}
-
-%% \vspace{0.25 cm}
-%% \begin{onlyenv}<1>
-%% \begin{tabular}{r l}
-%% \small starts  &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\
-%% \small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
-%% \small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
-%% \small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
-%% \small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
-%% \end{tabular}
-%% \end{onlyenv}\begin{onlyenv}<2->
-%% \begin{tabular}{r l}
-%% \small starts  &     \textcolor{red}{\tt\scriptsize \ \ \ \ \ 1,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ } \\
-%% \small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
-%% \small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
-%% \small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
-%% \small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
-%% \end{tabular}\end{onlyenv}
-
-%% \vspace{0.5 cm}
-%% \uncover<3>{We didn't need to touch any contents (read them from disk, decompress them\ldots).}
-%% \end{frame}
-
-%% \begin{frame}{Library for manipulating non-standard array types}
-%% \vspace{0.5 cm}
-%% \begin{columns}
-%% \column{0.45\linewidth}
-%% \includegraphics[width=\linewidth]{awkward-logo.pdf}
-
-%% \vspace{0.25 cm}
-%% \hfill \scriptsize \textcolor{darkblue}{\url{github.com/scikit-hep/awkward-array}}
-
-%% \column{0.55\linewidth}
-%% \vspace{0.5 cm}
-%% \vspace{2\baselineskip}
-%% \begin{itemize}
-%% \item variable-length subarrays
-%% \item struct-of-arrays looking like array-of-structs
-%% \item nullable types
-%% \item heterogeneous types (tagged unions)
-%% \item cross-references or even cyclic references
-%% \item sparse, non-contiguous, lazy
-%% \end{itemize}
-
-%% \vspace{0.5 cm}
-%% \uncover<2>{Any awkward array can be placed within any other awkward array.}
-%% \end{columns}
-%% \end{frame}
-
-%% \begin{frame}[fragile]{Not lacking for data types}
-%% \vspace{0.5 cm}
-%% Nullable, heterogeneous, multiple levels of depth, nested records\ldots
-
-%% \small
-%% \begin{minted}{python}
-%% >>> import awkward
-%% >>> array = awkward.fromiter(
-%% ...     [[1.1, 2.2, None, 3.3, None],
-%% ...      [4.4, [5.5]],
-%% ...      [{"x": 6, "y": {"z": 7}}, None, {"x": 8, "y": {"z": 9}}]])
-%% \end{minted}
-
-%% \begin{uncoverenv}<2->
-%% \begin{minted}{python}
-%% >>> print(array)            # internally, these are all arrays
-%% [[1.1 2.2 None 3.3 None] [4.4 [5.5]] [<Row 0> None <Row 1>]]
-%% \end{minted}
-%% \end{uncoverenv}
-
-%% \begin{uncoverenv}<3->
-%% \begin{minted}{python}
-%% >>> print(array[:, -2:])    # all of outer list, last two of inner
-%% [[3.3 None] [4.4 [5.5]] [None <Row 1>]]
-%% \end{minted}
-%% \end{uncoverenv}
-
-%% \begin{uncoverenv}<4->
-%% \begin{minted}{python}
-%% >>> (array + 100).tolist()  # element-wise function applied to arrays
-%% [[101.1, 102.2, None, 103.3, None],
-%%  [104.4, [105.5]],
-%%  [{'x': 106, 'y': {'z': 107}}, None, {'x': 108, 'y': {'z': 109}}]]
-%% \end{minted}
-%% \end{uncoverenv}
-%% \end{frame}
-
-%% \begin{frame}{Columnar data structures minimize memory use and time}
-%% \vspace{0.5 cm}
-%% One operation, deriving $p_z$ of a variable number of $p_T$ and $\eta$ per event, using \textcolor{darkorange2}{awkward-array}, \textcolor{blue}{ROOT}, \textcolor{darkpink}{pure Python}, and \textcolor{darkgreen}{root\_numpy}.
-
-%% \vspace{0.2 cm}
-%% \begin{center}
-%% \includegraphics[width=0.9\linewidth]{logscales.pdf}
-%% \end{center}
-%% \end{frame}
-
-%% \begin{frame}{Real life}
-%% \vspace{0.5 cm}
-%% \LARGE
-%% \begin{center}
-%% a single operation $\ne$ a physics analysis
-%% \end{center}
-%% \end{frame}
-
-%% \begin{frame}{Performing complete analyses with columnar tools}
-%% \vspace{0.5 cm}
-%% \begin{columns}
-%% \column{0.2\linewidth}
-%% \includegraphics[width=\linewidth]{coffea-logo.png}
-
-%% \column{0.8\linewidth}
-%% \hspace{-0.2 cm}\Huge Coffea
-
-%% \vspace{0.25 cm}
-%% \large {\bf C}olumnar {\bf O}bject {\bf F}ramework {\bf F}or {\bf E}fficient {\bf A}nalysis
-
-%% \vspace{0.25 cm}
-%% \normalsize Matteo~Cremonesi, Lindsey~Gray, Oliver~Gutsche, Allison~Hall, Bo~Jayatilaka, Igor~Mandrichenko, Kevin~Pedro, Nick~Smith~[FNAL], and~me~[Princeton] \hfill \textcolor{blue}{\url{github.com/CoffeaTeam}}
-%% \end{columns}
-
-%% \begin{center}
-%% \begin{minipage}{0.65\linewidth}
-%% \large Performing two complete CMS analyses:
-%% \begin{itemize}
-%% \item Dark Higgs search
-%% \item Boosted SM $H \to b\bar{b}$
-%% \end{itemize}
-%% \end{minipage}
-%% \end{center}
-
-%% \vspace{0.25 cm}
-%% Also developing {\tt fnal-column-analysis-tools}, a HEP layer on awkward-array,
-%% and a distributed query processing system with Ben Galewsky, Mark Neubauer [Illinois], and Andrew Melo [Vanderbilt].
-%% \end{frame}
-
-%% \begin{frame}{First finished analysis: $Z$ peak}
-%% \vspace{0.5 cm}
-%% $Z$ peak is the ``hello world'' of analysis frameworks.
-
-%% \vspace{0.25 cm}
-%% This implementation is realistic: run/lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook.
-
-%% \vspace{0.5 cm}
-%% \textcolor{blue}{\small \url{github.com/nsmith-/coffea/blob/master/notebooks/zpeak.ipynb}}
-
-%% \vspace{0.5 cm}
-%% \begin{columns}[b]
-%% \column{0.4\linewidth}
-%% \large
-%% \begin{description}
-%% \item[columnar analysis:] \hfill \mbox{\hspace{-1 cm}8~$\mu$s/event/thread (125~kHz)}
-%% \item[ROOT C++:] \hfill \mbox{\hspace{-1 cm}5.3~$\mu$s/event/thread (190~kHz)}
-%% \end{description}
-
-%% \vspace{0.25 cm}
-%% Columnar analysis is about 50\% slower than its C++ equivalent.
-
-%% \column{0.4\linewidth}
-%% \includegraphics[width=\linewidth]{zpeak-performance-breakdown.png}
-%% \end{columns}
-%% \end{frame}
-
-%% \begin{frame}[fragile]{Second near-complete analysis}
-%% \vspace{0.5 cm}
-%% \begin{columns}[t]
-%% \column{0.4\linewidth}
-%% \textcolor{darkblue}{Prototype of $H \to b\bar{b}$ has}
-%% \begin{itemize}
-%% \item recursive gen parent-finding
-%% \item gen-reco matching
-%% \item binned corrections
-%% \item parametric corrections
-%% \item systematics
-%% \end{itemize}
-
-%% \large
-%% \vspace{0.25 cm}
-%% 30~$\mu$s/event/thread (30~kHz)
-
-%% \column{0.6\linewidth}
-%% \begin{uncoverenv}<2->
-%% Example of combinatorics: gen-reco matching
-
-%% \small
-%% \begin{minted}{python}
-%% # make an array of all gen-reco pairs
-%% pairing = gen.cross(reco, nested=True)
-
-%% # delta R between gen (i0) and reco (i1)
-%% metric = pairing.i0.delta_r(pairing.i1)
-
-%% # the smallest delta R is best (indexes)
-%% best = metric.argmin()
-
-%% # but keep only delta R < 0.5 (mask)
-%% passes_cut = (metric[best] < 0.5)
-
-%% # now apply indexes and mask to select
-%% selected_pair = pairing[best][passes_cut]
-%% genrecos = selected_pair.flatten(axis=1)
-%% \end{minted}
-%% \end{uncoverenv}
-%% \end{columns}
-%% \end{frame}
-
-%% \begin{frame}[fragile]{Feedback from physicists}
-%% \vspace{0.5 cm}\large
-%% \begin{itemize}\setlength{\itemsep}{0.3 cm}
-%% \item<1-> Many bug-fixes, of course.
-%% \item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
-%% \item<3-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
-%% \item<4-> Discovering which operations are frequently used in analysis, which aren't.
-%% \item<5-> Need to unlearn order-dependent coding habits:
-
-%% \small\begin{minted}{python}
-%% (nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
-%% \end{minted}
-%% \large
-
-%% may try to evaluate the first muon from an event with zero muons.
-
-%% \vspace{0.25 cm}
-%% \begin{uncoverenv}<6->
-%% Instead,
-
-%% \small\begin{minted}{python}
-%% Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
-%% \end{minted}
-%% \end{uncoverenv}
-%% \end{itemize}
-%% \end{frame}
-
-\begin{frame}{Syntax is an extension of Numpy}
-\vspace{0.5 cm}
-Numpy arrays must all be rectangular: vectors, matrices, and tensors.
+\begin{uncoverenv}<2>
+\vspace{0.25 cm}
+Analysis datasets are big lists of variable-length lists of structs/objects/records.
 
 \vspace{0.25 cm}
-Awkward arrays reproduce this behavior in rectangular cases and generalize in jagged cases. For example:
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+[[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+ [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+ [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\end{uncoverenv}
+\end{frame}
+
+\begin{frame}[fragile]{Columnar representation}
+\vspace{0.5 cm}
+
+But they don't have to be ``structs,'' pointers to contiguous $p_T$, $\eta$, $\phi$ triples.
+
+\scriptsize
+\begin{Verbatim}[commandchars=\\\{\}]
+[[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+ [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+ [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\normalsize
+
+\vspace{0.5 cm}
+They can be contiguous by field with \only<1>{\textcolor{red}{offsets}}\only<2,3,4>{offsets} or \only<2>{\textcolor{red}{starts/stops}}\only<1,3,4>{starts/stops} or \only<3>{\textcolor{red}{counts}}\only<1,2,4>{counts} or \only<4>{\textcolor{red}{parents}}\only<1,2,3>{parents} arrays.
+
+\vspace{0.25 cm}
+\begin{tabular}{r l}
+\only<1>{\small \textcolor{red}{offsets} & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ \ 7} \\}
+\only<3>{\small \textcolor{red}{counts}  & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,\ \ \ \ \ \ 1,\ \ \ \ \ \ 2\ \ \ \ \ \ \ \ \ } \\}
+\only<4>{\small \textcolor{red}{parents} & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 0,\ \ \ \ \ \ 1,\ \ \ \ \ \ 2,\ \ \ \ \ \ 3,\ \ \ \ \ 3} \\}
+\only<2>{\small \textcolor{red}{starts}  & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\}
+\uncover<2>{\small \textcolor{red}{stops}   & \textcolor{red}{\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\}
+\small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+\small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+\small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]{This allows for efficient ways of {\it manipulating} data}
+\vspace{0.25 cm}
+
+``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ rewrite all inner lists.}}
+
+\scriptsize
+\begin{onlyenv}<1>
+\begin{Verbatim}[commandchars=\\\{\}]
+[[Muon(\textcolor{darkgreen}{31.1}, \textcolor{darkorange}{-0.481}, \textcolor{blue}{0.882}), Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [Muon(\textcolor{darkgreen}{5.27}, \textcolor{darkorange}{1.246}, \textcolor{blue}{-0.991})],
+ [Muon(\textcolor{darkgreen}{4.72}, \textcolor{darkorange}{-0.207}, \textcolor{blue}{0.953})],
+ [Muon(\textcolor{darkgreen}{8.59}, \textcolor{darkorange}{-1.754}, \textcolor{blue}{-0.264}), Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\end{onlyenv}\begin{onlyenv}<2->
+\begin{Verbatim}[commandchars=\\\{\}]
+[[     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     }   Muon(\textcolor{darkgreen}{9.76}, \textcolor{darkorange}{-0.124}, \textcolor{blue}{0.924}), Muon(\textcolor{darkgreen}{8.18}, \textcolor{darkorange}{-0.119}, \textcolor{blue}{0.923})],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{     }  \textcolor{blue}{      } ],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{     } ],
+ [     \textcolor{darkgreen}{    }  \textcolor{darkorange}{      }  \textcolor{blue}{      }   Muon(\textcolor{darkgreen}{8.714}, \textcolor{darkorange}{0.185}, \textcolor{blue}{0.629})],
+ ...
+\end{Verbatim}
+\end{onlyenv}
+\normalsize
+
+\vspace{0.5 cm}
+``Remove the first muon from each event.'' \uncover<2->{\textcolor{red}{$\longrightarrow$ increase all starts by 1.}}
+
+\vspace{0.25 cm}
+\begin{onlyenv}<1>
+\begin{tabular}{r l}
+\small starts  &                    {\tt\scriptsize \ \ \ \ \ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3,\ \ \ \ \ \ 4,\ \ \ \ \ \ 5\ \ \ \ \ \ \ \ \ } \\
+\small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
+\small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+\small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+\small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+\end{tabular}
+\end{onlyenv}\begin{onlyenv}<2->
+\begin{tabular}{r l}
+\small starts  &     \textcolor{red}{\tt\scriptsize \ \ \ \ \ 1,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 6\ \ \ \ \ \ \ \ \ } \\
+\small stops   &                    {\tt\scriptsize \ \ \ \ \ 3,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \ \ \ \ \ 5,\ \ \ \ \ \ 7\ \ \ \ \ \ \ \ \ } \\
+\small $p_T$ & \textcolor{darkgreen}{\tt\scriptsize \ \ 31.1,\ \ \ 9.76,\ \ \ 8.18,\ \ \ 5.27,\ \ \ 4.72,\ \ \ 8.59, 8.714} \\
+\small phi &  \textcolor{darkorange}{\tt\scriptsize -0.481,\ -0.123,\ -0.119,\ \ 1.246,\ -0.207,\ -1.754,\ 0.185} \\
+\small eta &        \textcolor{blue}{\tt\scriptsize \ 0.882,\ \ 0.924,\ \ 0.923,\ -0.991,\ \ 0.953,\ -0.264,\ 0.629} \\
+\end{tabular}\end{onlyenv}
+
+\vspace{0.5 cm}
+\uncover<3>{We didn't need to touch any contents (read them from disk, decompress them\ldots).}
+\end{frame}
+
+\begin{frame}{Library for manipulating non-standard array types}
+\vspace{0.5 cm}
+\begin{columns}
+\column{0.45\linewidth}
+\includegraphics[width=\linewidth]{awkward-logo.pdf}
+
+\vspace{0.25 cm}
+\hfill \scriptsize \textcolor{darkblue}{\url{github.com/scikit-hep/awkward-array}}
+
+\column{0.55\linewidth}
+\vspace{0.5 cm}
+\vspace{2\baselineskip}
 \begin{itemize}
-\item 
+\item variable-length subarrays
+\item struct-of-arrays looking like array-of-structs
+\item nullable types
+\item heterogeneous types (tagged unions)
+\item cross-references or even cyclic references
+\item sparse, non-contiguous, lazy
+\end{itemize}
 
+\vspace{0.5 cm}
+\uncover<2>{Any awkward array can be placed within any other awkward array.}
+\end{columns}
+\end{frame}
 
+\begin{frame}[fragile]{Not lacking for data types}
+\vspace{0.5 cm}
+Nullable, heterogeneous, multiple levels of depth, nested records\ldots
 
+\small
+\begin{minted}{python}
+>>> import awkward
+>>> array = awkward.fromiter(
+...     [[1.1, 2.2, None, 3.3, None],
+...      [4.4, [5.5]],
+...      [{"x": 6, "y": {"z": 7}}, None, {"x": 8, "y": {"z": 9}}]])
+\end{minted}
+
+\begin{uncoverenv}<2->
+\begin{minted}{python}
+>>> print(array)            # internally, these are all arrays
+[[1.1 2.2 None 3.3 None] [4.4 [5.5]] [<Row 0> None <Row 1>]]
+\end{minted}
+\end{uncoverenv}
+
+\begin{uncoverenv}<3->
+\begin{minted}{python}
+>>> print(array[:, -2:])    # all of outer list, last two of inner
+[[3.3 None] [4.4 [5.5]] [None <Row 1>]]
+\end{minted}
+\end{uncoverenv}
+
+\begin{uncoverenv}<4->
+\begin{minted}{python}
+>>> (array + 100).tolist()  # element-wise function applied to arrays
+[[101.1, 102.2, None, 103.3, None],
+ [104.4, [105.5]],
+ [{'x': 106, 'y': {'z': 107}}, None, {'x': 108, 'y': {'z': 109}}]]
+\end{minted}
+\end{uncoverenv}
+\end{frame}
+
+\begin{frame}{Columnar data structures minimize memory use and time}
+\vspace{0.5 cm}
+One operation, deriving $p_z$ of a variable number of $p_T$ and $\eta$ per event, using \textcolor{darkorange2}{awkward-array}, \textcolor{blue}{ROOT}, \textcolor{darkpink}{pure Python}, and \textcolor{darkgreen}{root\_numpy}.
+
+\vspace{0.2 cm}
+\begin{center}
+\includegraphics[width=0.9\linewidth]{logscales.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Real life}
+\vspace{0.5 cm}
+\LARGE
+\begin{center}
+a single operation $\ne$ a physics analysis
+\end{center}
+\end{frame}
+
+\begin{frame}{Performing complete analyses with columnar tools}
+\vspace{0.5 cm}
+\begin{columns}
+\column{0.2\linewidth}
+\includegraphics[width=\linewidth]{coffea-logo.png}
+
+\column{0.8\linewidth}
+\hspace{-0.2 cm}\Huge Coffea
+
+\vspace{0.25 cm}
+\large {\bf C}olumnar {\bf O}bject {\bf F}ramework {\bf F}or {\bf E}fficient {\bf A}nalysis
+
+\vspace{0.25 cm}
+\normalsize Matteo~Cremonesi, Lindsey~Gray, Oliver~Gutsche, Allison~Hall, Bo~Jayatilaka, Igor~Mandrichenko, Kevin~Pedro, Nick~Smith~[FNAL], and~me~[Princeton] \hfill \textcolor{blue}{\url{github.com/CoffeaTeam}}
+\end{columns}
+
+\begin{center}
+\begin{minipage}{0.65\linewidth}
+\large Performing two complete CMS analyses:
+\begin{itemize}
+\item Dark Higgs search
+\item Boosted SM $H \to b\bar{b}$
+\end{itemize}
+\end{minipage}
+\end{center}
+
+\vspace{0.25 cm}
+Also developing {\tt fnal-column-analysis-tools}, a HEP layer on awkward-array,
+and a distributed query processing system with Ben Galewsky, Mark Neubauer [Illinois], and Andrew Melo [Vanderbilt].
+\end{frame}
+
+\begin{frame}{First finished analysis: $Z$ peak}
+\vspace{0.5 cm}
+$Z$ peak is the ``hello world'' of analysis frameworks.
+
+\vspace{0.25 cm}
+This implementation is realistic: run/lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook.
+
+\vspace{0.5 cm}
+\textcolor{blue}{\small \url{github.com/nsmith-/coffea/blob/master/notebooks/zpeak.ipynb}}
+
+\vspace{0.5 cm}
+\begin{columns}[b]
+\column{0.4\linewidth}
+\large
+\begin{description}
+\item[columnar analysis:] \hfill \mbox{\hspace{-1 cm}7~$\mu$s/event/thread (140~kHz)}
+\item[ROOT C++:] \hfill \mbox{\hspace{-1 cm}4.6~$\mu$s/event/thread (210~kHz)}
+\end{description}
+
+\vspace{0.25 cm}
+Columnar analysis is about 50\% slower than its C++ equivalent.
+
+\column{0.4\linewidth}
+\includegraphics[width=\linewidth]{zpeak-performance-breakdown.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Second near-complete analysis}
+\vspace{0.5 cm}
+\begin{columns}[t]
+\column{0.4\linewidth}
+\textcolor{darkblue}{Prototype of $H \to b\bar{b}$ has}
+\begin{itemize}
+\item recursive gen parent-finding
+\item gen-reco matching
+\item binned corrections
+\item parametric corrections
+\item systematics
+\end{itemize}
+
+\large
+\vspace{0.25 cm}
+70~$\mu$s/event/thread (14~kHz)
+
+\column{0.6\linewidth}
+\begin{uncoverenv}<2->
+Example of combinatorics: gen-reco matching
+
+\small
+\begin{minted}{python}
+# make an array of all gen-reco pairs
+pairing = gen.cross(reco, nested=True)
+
+# delta R between gen (i0) and reco (i1)
+metric = pairing.i0.delta_r(pairing.i1)
+
+# the smallest delta R is best (indexes)
+best = metric.argmin()
+
+# but keep only delta R < 0.5 (mask)
+passes_cut = (metric[best] < 0.5)
+
+# now apply indexes and mask to select
+selected_pair = pairing[best][passes_cut]
+genrecos = selected_pair.flatten(axis=1)
+\end{minted}
+\end{uncoverenv}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Syntax is an extension of Numpy}
+\vspace{0.25 cm}
+\only<1>{\textcolor{red}{Numpy arrays must all be rectangular: vectors, matrices, and tensors.}}\only<2>{Numpy arrays must all be rectangular: vectors, matrices, and tensors.} \only<1>{Awkward arrays reproduce this behavior in rectangular cases and generalize in jagged cases.}\only<2>{\textcolor{red}{Awkward arrays reproduce this behavior in rectangular cases and generalize in jagged cases.}}
+
+\begin{onlyenv}<1>
+\begin{itemize}\setlength{\itemsep}{0.15 cm}
+\item Multidimensional slices: \tabto{5.5 cm}{\small \mintinline{python}{rgb_pixels[0, 50:100, ::3]}}
+\item Elementwise operations: \tabto{5.5 cm}{\small \mintinline{python}{all_pz = all_pt * sinh(all_eta)}}
+\item Broadcasting: \tabto{5.5 cm}{\small \mintinline{python}{all_phi - 2*pi}}
+\item Masking (list compaction): \tabto{5.5 cm}{\small \mintinline{python}{data[trigger & (pt > 40)]}}
+\item Fancy indexing (gather/scatter): \tabto{5.5 cm}{\small \mintinline{python}{all_eta[argsort(all_pt)]}}
+\item Row/column commutativity \tabto{5.5 cm}{\small \mintinline{python}{table["column"][7]} (row 7 of column array)}
+
+(hides AoS $\leftrightarrow$ SoA): \tabto{5.5 cm}{\small \mintinline{python}{table[7]["column"]} (field of row tuple 7)}
+\item Array reduction: \tabto{5.5 cm}{\small \mintinline{python}{array.sum()}} $\to$ scalar
+\end{itemize}
+\end{onlyenv}\begin{onlyenv}<2>
+\begin{itemize}\setlength{\itemsep}{0.15 cm}
+\item Multidimensional slices: \tabto{5.5 cm}{\small \mintinline{python}{events["jets"][:, 0]}} $\to$ first jet per event
+\item Elementwise operations: \tabto{5.5 cm}{\small \mintinline{python}{jetpt * sinh(jeteta)}} $\to$ \mbox{keep jagged structure\hspace{-1 cm}}
+\item Broadcasting: \tabto{5.5 cm}{\small \mintinline{python}{jetphi - metphi}} $\to$ expand {\small \mintinline{python}{metphi}} from
+
+\tabto{5.5 cm}one-per-event to one-per-jet before operation
+
+\item Masking (list compaction): \tabto{5.5 cm}{\small \mintinline{python}{data[trigger]}} $\to$ drop whole events
+
+\tabto{5.5 cm}{\small \mintinline{python}{data[jetpt > 40]}} $\to$ drop jets from events
+
+\item Fancy indexing (gather/scatter): \tabto{5.5 cm}{\small \mintinline{python}{a = argmax(jetpt)}} $\to$ \mbox{\small \mintinline{python}{[[2], [], [1], [4]]}\hspace{-0.5 cm}}
+
+\tabto{5.5 cm}{\small \mintinline{python}{jeteta[a]}} $\to$ \mbox{\small \mintinline{python}{[[3.6], [], [-1.2], [0.4]]}\hspace{-0.5 cm}}
+
+\item Row/column commutativity \tabto{5.5 cm}{\small \mintinline{python}{events["jets"]["pt"][7, 1]}},
+
+\tabto{5.5 cm}{\small \mintinline{python}{events["jets"][7]["pt"][1]}},
+
+\tabto{5.5 cm}{\small \mintinline{python}{events[7]["jets"]["pt"][1]}}, \ldots
+
+\item Jagged array reduction: \tabto{5.5 cm}{\small \mintinline{python}{jetpt.max()}} $\to$ array of max jet $p_T$ per event
+\end{itemize}
+\end{onlyenv}
+\end{frame}
+
+\begin{frame}[fragile]{Lorentz vector functions apply to arrays and jagged arrays}
+\vspace{0.5 cm}
+\textcolor{darkblue}{Structure for particle candidates:}
+
+{\tt \small JaggedArray(ObjectArray(Table(px, py, pz, E), LorentzVector))}
+
+\begin{itemize}
+\item {\tt \small JaggedArray} because there's a variable number per event
+\item {\tt \small ObjectArray} to produce {\tt \small LorentzVector} objects from array data
+\item {\tt \small Table} to hold contiguous or non-contiguous arrays of each component
+\item {\tt \small px}, {\tt \small py}, {\tt \small pz}, {\tt \small E} are Numpy arrays.
+\end{itemize}
+
+\begin{uncoverenv}<2->
+\vspace{0.5 cm}
+The {\tt \small LorentzVector} objects have kinematic methods---{\tt \small pt}, {\tt \small eta}, {\tt \small mass}, etc.--- but so does the {\tt \small ObjectArray} and {\tt \small JaggedArray}.
+
+\vspace{0.25 cm}
+To compute the mass of all particles, accounting for the right number of particles per event, you say
+
+\small\begin{minted}{python}
+>>> particles.mass
+\end{minted}
+\end{uncoverenv}
+\end{frame}
+
+\begin{frame}[fragile]{Pulling it all together}
+\small
+\vspace{0.1 cm}
+\begin{columns}
+\column{1.1\linewidth}
+\begin{minted}{python}
+>>> import uproot
+>>> dataset = uproot.open("HZZ-objects.root")["events"]
+>>> array = dataset.array("muonp4")
+
+>>> array                                # muons for all events
+<JaggedArray [[TLorentzVector(-52.899, -11.655, -8.1608, 54.779)
+               TLorentzVector(37.738, 0.69347, -11.308, 39.402)] ...]>
+>>> array[0, 1]                          # second particle in first event
+TLorentzVector(37.738, 0.69347, -11.308, 39.402)
+
+>>> hastwo = (array.counts >= 2)         # events with at least two muons
+>>> leading = array[hastwo, 0]           # mask and select first
+>>> subleading = array[hastwo, 1]        # mask and select second
+
+>>> candidates = leading + subleading    # Lorentz vector sum across all
+>>> candidates.mass                      # compute mass for all
+array([90.22779777, 74.74654928, ..., 85.44384208, 75.96066262])
+\end{minted}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Feedback from physicists}
+\vspace{0.5 cm}\large
+\begin{itemize}\setlength{\itemsep}{0.3 cm}
+\item<1-> Many bug-fixes, of course.
+\item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
+\item<3-> A lot of time spent in validity checks (e.g.\ no starts beyond length of content). Need to avoid redundant checks without removing safety.
+\item<4-> Discovering which operations are frequently used in analysis, which aren't.
+\item<5-> Interesting mistake: need to unlearn order-dependent coding habits
+
+\small\begin{minted}{python}
+(nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
+\end{minted}
+\large
+
+may try to evaluate the first muon from an event with zero muons.
+
+\vspace{0.25 cm}
+\begin{uncoverenv}<6->
+Instead,
+
+\small\begin{minted}{python}
+Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
+\end{minted}
+\end{uncoverenv}
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Is this making analysis \underline{easier}?}
+\vspace{0.5 cm}
+\Large
 
+\begin{center}
+\begin{minipage}{0.8\linewidth}
+\textcolor{darkblue}{If yes,} great! Continue developing array operations, thinking about their ``ergonomics,'' and optimizing their implementations.
 
+\vspace{0.75 cm}
+\textcolor{darkblue}{If no,} it's still a useful abstraction layer, but we'll need a more user-friendly interface, such as a functional or declarative language that resolves to array operations.
+\end{minipage}
+\end{center}
+\end{frame}
 
+\begin{frame}{Half-hour interviews with physicists about array syntax}
+\vspace{0.5 cm}
+2 beginning grad students, 1 beginning and 1 advanced postdoc, 1 advanced researcher
+
+\vspace{1.5 cm}
+\begin{center}
+\LARGE SOME QUOTES HERE
+\end{center}
+\end{frame}
+
+\begin{frame}{Further developments}
+\vspace{0.2 cm}
+\begin{itemize}\setlength{\itemsep}{0.2 cm}
+\item<1-> Numba is a JIT-compiler for Python, but it only works on data that can be statically typed. Awkward array types are all known before a big computation, so I'm extending Numba to recognize them and JIT-compile array operations.
+
+\vspace{0.1 cm}
+This will permit compiled (fast), imperative (for-loop style) calculations in Python.
+
+\item<2-> Possible Google Summer of Code project to add precompiled and/or CUDA implementations, depending on the abilities and interests of the student.
+
+\item<3-> Michael Hedges (Purdue) is developing Pandas extensions, so that DataFrame columns can contain jagged data and perform efficient jagged operations.
+
+\item<4-> Giuseppe Cerati (Fermilab) is investigating the use of the jagged array concept in reconstruction, using C++.
+
+\vspace{0.1 cm}
+\textcolor{darkblue}{Goal:} single codebase that is efficient on CPUs and GPUs.
+
+\vspace{0.1 cm}
+\textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from {\tt \small import numpy as np} $\to$ {\tt \small import cupy as np}.
+
+Reimplemented in C++ using xtensor (Numpy clone for C++).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusions}
+
+\end{frame}
 
 \end{document}
 
