@@ -454,7 +454,7 @@ array([90.22779777, 74.74654928, ..., 85.44384208, 75.96066262])
 \item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
 \item<3-> A lot of time spent in validity checks (e.g.\ to ensure that {\tt \small starts} are all within {\tt \small content}). Need to avoid redundant checks without removing safety.
 \item<4-> Discovering which operations are frequently used in analysis, which aren't.
-\item<5-> Interesting mistake: need to unlearn order-dependent coding habits.
+\item<5-> Interesting mistake: need to unlearn order-dependent coding habits!
 
 \small\begin{minted}{python}
 (nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
@@ -480,10 +480,10 @@ Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
 
 \begin{center}
 \begin{minipage}{0.8\linewidth}
-\textcolor{darkblue}{If yes,} great! Continue developing array operations, thinking about their ``ergonomics,'' and optimizing their implementations.
+\textcolor{darkblue}{If yes,} great! Continue developing array operations, thinking about their ``ergonomics,'' and optimize their implementations.
 
 \vspace{0.75 cm}
-\textcolor{darkblue}{If no,} it's still a useful abstraction layer, but we'll need a more user-friendly interface, such as a functional or declarative language that resolves to array operations.
+\textcolor{darkblue}{If no,} it's still a useful abstraction layer, but we'll need a more user-friendly interface on top of it, such as a functional or declarative language that resolves to array operations.
 \end{minipage}
 \end{center}
 \end{frame}
