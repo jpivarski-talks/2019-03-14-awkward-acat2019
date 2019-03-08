@@ -278,7 +278,7 @@ Also developing {\tt fnal-column-analysis-tools}, a HEP layer on awkward-array,
 and a distributed query processing system with Ben Galewsky, Mark Neubauer [Illinois], and Andrew Melo [Vanderbilt].
 \end{frame}
 
-\begin{frame}{First finished analysis: $Z$ peak}
+\begin{frame}[fragile]{First finished analysis: $Z$ peak}
 \vspace{0.5 cm}
 $Z$ peak is the ``hello world'' of analysis frameworks.
 
@@ -302,7 +302,7 @@ Columnar analysis is about 50\% slower than its C++ equivalent.
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Second near-complete analysis}
+\begin{frame}{Second near-complete analysis}
 \vspace{0.5 cm}
 \begin{columns}[t]
 \column{0.4\linewidth}
@@ -321,30 +321,68 @@ Columnar analysis is about 50\% slower than its C++ equivalent.
 
 \vspace{0.25 cm}
 Uses about 100 columns.
+\end{columns}
+\end{frame}
 
-\column{0.6\linewidth}
-\begin{uncoverenv}<2->
-\textcolor{darkblue}{\hspace{-0.15 cm}Example of combinatorics: gen-reco matching}
+\begin{frame}[fragile]{Code examples from the boosted $H \to b\bar{b}$ analysis}
+\vspace{0.5 cm}
+%% \textcolor{darkblue}{\hspace{-0.15 cm}Example of combinatorics: gen-reco matching}
 
-\small
+%% \small
+%% \begin{minted}{python}
+%% # make an array of all gen-reco pairs
+%% pairing = gen.cross(reco, nested=True)
+
+%% # delta R between gen (i0) and reco (i1)
+%% metric = delta_r(pairing.i0, pairing.i1)
+
+%% # the smallest delta R is best (indexes)
+%% best = metric.argmin()
+
+%% # but keep only delta R < 0.5 (mask)
+%% passes_cut = (metric[best] < 0.5)
+
+%% # now apply indexes and mask to select
+%% selected_pair = pairing[best][passes_cut]
+%% genrecos = selected_pair.flatten(axis=1)
+%% \end{minted}
+\begin{columns}
+\column{0.8\linewidth}
+\textcolor{darkblue}{VBF signal region definition:}
+
+\scriptsize
 \begin{minted}{python}
-# make an array of all gen-reco pairs
-pairing = gen.cross(reco, nested=True)
-
-# delta R between gen (i0) and reco (i1)
-metric = delta_r(pairing.i0, pairing.i1)
-
-# the smallest delta R is best (indexes)
-best = metric.argmin()
-
-# but keep only delta R < 0.5 (mask)
-passes_cut = (metric[best] < 0.5)
-
-# now apply indexes and mask to select
-selected_pair = pairing[best][passes_cut]
-genrecos = selected_pair.flatten(axis=1)
+AK4jet_AK8jet_matches = ak4_goodjets.fastmatch(leadingak8jet)
+unmatched_ak4 = ak4_goodjets[~AK4jet_AK8jet_matches]
+vbf_ak4_pairs = unmatched_ak4.p4.distincts(nested=True)
+vbf_ak4_detas = np.abs(vbf_ak4_pairs.i0.eta - vbf_ak4_pairs.i1.eta).flatten()
+vbf_ak4_maxdetas = vbf_ak4_detas.argmax()
+vbf_ak4_masses = (vbf_ak4_pairs.i0 + vbf_ak4_pairs.i1).mass.flatten()[vbf_ak4_maxdetas]
+vbf_ak4_pass = (vbf_ak4_detas[vbf_ak4_maxdetas] > 3.25) & (vbf_ak4_masses > 975.0)
 \end{minted}
-\end{uncoverenv}
+\column{0.2\linewidth}
+\end{columns}
+
+\normalsize
+
+\vspace{0.5 cm}
+\begin{columns}
+\column{0.2\linewidth}
+\column{0.8\linewidth}
+\textcolor{darkblue}{Leading fat-jet selection with vetos:}
+\scriptsize
+\begin{minted}{python}
+k8puppijet_pt200 = ak8puppijet[
+                       passLooseJetSel(ak8puppijet) & 
+                       (ak8puppijet.pt > 200) & 
+                       (np.abs(ak8puppijet.eta) < 2.5)]
+ak8veto = ~(
+    ak8puppijet_pt200.fastmatch(vetoMuons,deltaRCut=0.4) | 
+    ak8puppijet_pt200.fastmatch(vetoElectrons,deltaRCut=0.4) |
+    ak8puppijet_pt200.fastmatch(vetoPhotons,deltaRCut=0.4) )    
+ak8jets_veto = ak8puppijet_pt200[ak8veto]    
+leadingak8jet = ak8jets_veto[ak8jets_veto.pt.argmax()]
+\end{minted}
 \end{columns}
 \end{frame}
 
