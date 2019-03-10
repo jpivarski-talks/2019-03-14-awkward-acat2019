@@ -175,7 +175,7 @@ They can be contiguous by field with \only<1>{\textcolor{red}{counts}}\only<2,3,
 \vspace{0.25 cm}
 \hfill \scriptsize \textcolor{darkblue}{\mbox{\hspace{-0.75 cm}\url{https://github.com/scikit-hep/awkward-array}\hspace{-0.65 cm}}}
 
-\column{0.55\linewidth}
+\column{0.54\linewidth}
 \vspace{0.5 cm}
 \vspace{2\baselineskip}
 \begin{itemize}
@@ -286,6 +286,7 @@ $Z$ peak is the ``hello world'' of analysis frameworks.
 \textcolor{darkblue}{This implementation is realistic:} run-lumi mask, pile-up correction, ID scale factors, and $ee$/$\mu\mu$/$e\mu$ channels. 350~lines in a Jupyter notebook, accessing 25 columns.
 
 \vspace{0.25 cm}
+\begin{uncoverenv}<2->
 \begin{columns}
 \column{0.4\linewidth}
 \large
@@ -300,6 +301,7 @@ Columnar analysis is about 50\% slower than its C++ equivalent.
 \column{0.4\linewidth}
 \includegraphics[width=\linewidth]{zpeak-performance-breakdown.png}
 \end{columns}
+\end{uncoverenv}
 \end{frame}
 
 \begin{frame}{Second near-complete analysis}
@@ -324,7 +326,7 @@ Uses about 100 columns.
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Analyst's ``favorite stanzas'' of the boosted $H \to b\bar{b}$ analysis}
+\begin{frame}[fragile]{Analysts' ``favorite stanzas'' of the boosted $H \to b\bar{b}$ analysis}
 \vspace{0.5 cm}
 %% \textcolor{darkblue}{\hspace{-0.15 cm}Example of combinatorics: gen-reco matching}
 
