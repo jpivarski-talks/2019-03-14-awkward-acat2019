@@ -324,7 +324,7 @@ Uses about 100 columns.
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Code examples from the boosted $H \to b\bar{b}$ analysis}
+\begin{frame}[fragile]{Analyst's ``favorite stanzas'' of the boosted $H \to b\bar{b}$ analysis}
 \vspace{0.5 cm}
 %% \textcolor{darkblue}{\hspace{-0.15 cm}Example of combinatorics: gen-reco matching}
 
@@ -353,12 +353,12 @@ Uses about 100 columns.
 \scriptsize
 \begin{minted}{python}
 AK4jet_AK8jet_matches = ak4_goodjets.fastmatch(leadingak8jet)
-unmatched_ak4 = ak4_goodjets[~AK4jet_AK8jet_matches]
-vbf_ak4_pairs = unmatched_ak4.p4.distincts(nested=True)
-vbf_ak4_detas = np.abs(vbf_ak4_pairs.i0.eta - vbf_ak4_pairs.i1.eta).flatten()
+unmatched_ak4    = ak4_goodjets[~AK4jet_AK8jet_matches]
+vbf_ak4_pairs    = unmatched_ak4.p4.distincts(nested=True)
+vbf_ak4_detas    = np.abs(vbf_ak4_pairs.i0.eta - vbf_ak4_pairs.i1.eta).flatten()
 vbf_ak4_maxdetas = vbf_ak4_detas.argmax()
-vbf_ak4_masses = (vbf_ak4_pairs.i0 + vbf_ak4_pairs.i1).mass.flatten()[vbf_ak4_maxdetas]
-vbf_ak4_pass = (vbf_ak4_detas[vbf_ak4_maxdetas] > 3.25) & (vbf_ak4_masses > 975.0)
+vbf_ak4_masses   = (vbf_ak4_pairs.i0 + vbf_ak4_pairs.i1).mass.flatten()[vbf_ak4_maxdetas]
+vbf_ak4_pass     = (vbf_ak4_detas[vbf_ak4_maxdetas] > 3.25) & (vbf_ak4_masses > 975.0)
 \end{minted}
 \column{0.2\linewidth}
 \end{columns}
@@ -395,11 +395,23 @@ leadingak8jet = ak8jets_veto[ak8jets_veto.pt.argmax()]
 \item Multidimensional slices: \tabto{5.5 cm}{\small \mintinline{python}{rgb_pixels[0, 50:100, ::3]}}
 \item Elementwise operations: \tabto{5.5 cm}{\small \mintinline{python}{all_pz = all_pt * sinh(all_eta)}}
 \item Broadcasting: \tabto{5.5 cm}{\small \mintinline{python}{all_phi - 2*pi}}
+
+\tabto{5.5 cm}\mbox{ }
+
 \item Masking (list compaction): \tabto{5.5 cm}{\small \mintinline{python}{data[trigger & (pt > 40)]}}
+
+\tabto{5.5 cm}\mbox{ }
+
 \item Fancy indexing (gather/scatter): \tabto{5.5 cm}{\small \mintinline{python}{all_eta[argsort(all_pt)]}}
+
+\tabto{5.5 cm}\mbox{ }
+
 \item Row/column commutativity \tabto{5.5 cm}{\small \mintinline{python}{table["column"][7]} (row 7 of column array)}
 
 (hides AoS $\leftrightarrow$ SoA): \tabto{5.5 cm}{\small \mintinline{python}{table[7]["column"]} (field of row tuple 7)}
+
+\tabto{5.5 cm}\mbox{ }
+
 \item Array reduction: \tabto{5.5 cm}{\small \mintinline{python}{array.sum()}} $\to$ scalar
 \end{itemize}
 \end{onlyenv}\begin{onlyenv}<2>
@@ -420,7 +432,7 @@ leadingak8jet = ak8jets_veto[ak8jets_veto.pt.argmax()]
 
 \item Row/column commutativity \tabto{5.5 cm}{\small \mintinline{python}{events["jets"]["pt"][7, 1]}},
 
-\tabto{5.5 cm}{\small \mintinline{python}{events["jets"][7]["pt"][1]}},
+(hides AoS $\leftrightarrow$ SoA): \tabto{5.5 cm}{\small \mintinline{python}{events["jets"][7]["pt"][1]}},
 
 \tabto{5.5 cm}{\small \mintinline{python}{events[7]["jets"]["pt"][1]}}, \ldots
 
@@ -429,25 +441,28 @@ leadingak8jet = ak8jets_veto[ak8jets_veto.pt.argmax()]
 \end{onlyenv}
 \end{frame}
 
-\begin{frame}[fragile]{Vectorized application of physics functions}
-\vspace{0.5 cm}
-\textcolor{darkblue}{Structure for particle candidates:}
+\begin{frame}[fragile]{Structure for most physics data: multiple candidates per event}
+\vspace{0.4 cm}
 
-{\tt \small JaggedArray(ObjectArray(Table(px, py, pz, E), LorentzVector))}
-
-\begin{itemize}
-\item {\tt \small JaggedArray} because there's a variable number per event
-\item {\tt \small ObjectArray} to produce {\tt \small LorentzVector} objects from array data
-\item {\tt \small Table} to present contiguous or non-contiguous arrays as an array of rows
-\item {\tt \small px}, {\tt \small py}, {\tt \small pz}, {\tt \small E} are Numpy arrays.
-\end{itemize}
+\begin{center}
+{\tt \small \textcolor{blue}{JaggedArray}(\textcolor{darkorange}{ObjectArray}(\textcolor{darkgreen}{Table}(px, py, pz, E), \textcolor{darkorange}{LorentzVector}))}
+\end{center}
 
 \begin{uncoverenv}<2->
+\begin{itemize}
+\item {\tt \small px}, {\tt \small py}, {\tt \small pz}, {\tt \small E} are flat Numpy arrays (all particles, all events).
+\item \textcolor{darkgreen}{\tt \small Table} to present contiguous columns as an array of rows
+\item \textcolor{darkorange}{\tt \small ObjectArray} to interpret rows of the \textcolor{darkgreen}{\tt \small Table} as \textcolor{darkorange}{\tt \small LorentzVector} objects
+\item \textcolor{blue}{\tt \small JaggedArray} because there's a variable number of \textcolor{darkorange}{\tt \small LorentzVectors} per event
+\end{itemize}
+\end{uncoverenv}
+
+\begin{uncoverenv}<3->
 \vspace{0.5 cm}
-The {\tt \small LorentzVector} objects have kinematic methods---{\tt \small pt}, {\tt \small eta}, {\tt \small mass}, etc.--- but so does the {\tt \small ObjectArray} and {\tt \small JaggedArray}.
+Individual \textcolor{darkorange}{\tt \small LorentzVector} objects have kinematic methods---{\tt \small pt}, {\tt \small eta}, {\tt \small mass}, etc.--- but so do the \textcolor{darkorange}{\tt \small ObjectArray} and \textcolor{blue}{\tt \small JaggedArray}. Whole-array methods are vectorized.
 
 \vspace{0.25 cm}
-To compute the mass of all particles, accounting for the right number of particles per event, you say
+To compute the mass of all particles in all events are pack it into per-event sublists, you say
 
 \small\begin{minted}{python}
 >>> particles.mass
@@ -455,7 +470,7 @@ To compute the mass of all particles, accounting for the right number of particl
 \end{uncoverenv}
 \end{frame}
 
-\begin{frame}[fragile]{Pulling it all together}
+\begin{frame}[fragile]{Putting it all together: a simple Z peak}
 \small
 \vspace{0.1 cm}
 \begin{columns}
@@ -464,21 +479,38 @@ To compute the mass of all particles, accounting for the right number of particl
 >>> import uproot
 >>> dataset = uproot.open("HZZ-objects.root")["events"]
 >>> array = dataset.array("muonp4")
+\end{minted}
 
+\begin{uncoverenv}<2->
+\begin{minted}{python}
 >>> array                                # muons for all events
 <JaggedArray [[TLorentzVector(-52.899, -11.655, -8.1608, 54.779)
                TLorentzVector(37.738, 0.69347, -11.308, 39.402)] ...]>
->>> array[0, 1]                          # second particle in first event
-TLorentzVector(37.738, 0.69347, -11.308, 39.402)
+\end{minted}
+\end{uncoverenv}
 
+\begin{uncoverenv}<3->
+\begin{minted}{python}
+>>> array[0, 1]                          # second muon in first event
+TLorentzVector(37.738, 0.69347, -11.308, 39.402)
+\end{minted}
+\end{uncoverenv}
+
+\begin{uncoverenv}<4->
+\begin{minted}{python}
 >>> hastwo = (array.counts >= 2)         # to select at least two muons
 >>> leading = array[hastwo, 0]           # mask and select first
 >>> subleading = array[hastwo, 1]        # mask and select second
+\end{minted}
+\end{uncoverenv}
 
+\begin{uncoverenv}<5->
+\begin{minted}{python}
 >>> candidates = leading + subleading    # Lorentz vector sum across all
 >>> candidates.mass                      # compute mass for all
 array([90.22779777, 74.74654928, ..., 85.44384208, 75.96066262])
 \end{minted}
+\end{uncoverenv}
 \end{columns}
 \end{frame}
 
@@ -487,20 +519,20 @@ array([90.22779777, 74.74654928, ..., 85.44384208, 75.96066262])
 \begin{itemize}\setlength{\itemsep}{0.3 cm}
 \item<1-> Many bug-fixes, of course.
 \item<2-> {\tt\small argmin()} was an analysis bottleneck. Reimplemented to be 125$\times$ faster.
-\item<3-> A lot of time spent in validity checks (e.g.\ to ensure that {\tt \small starts} are all within {\tt \small content}). Need to avoid redundant checks without removing safety.
+\item<3-> Validity checks (e.g.\ to ensure that all {\tt \small starts}/{\tt \small stops} are within {\tt \small content}) are expensive. Need to avoid redundant checks without removing safety.
 \item<4-> Discovering which operations are frequently used in analysis, which aren't.
-\item<5-> Interesting mistake: need to unlearn order-dependent coding habits!
+\item<5-> \textcolor{darkblue}{Interesting mistake:} analysts must unlearn order-dependent coding habits!
 
 \small\begin{minted}{python}
 (nMuons > 0) & (Muons_pt[:, 0] > 30) # intersection of masks
 \end{minted}
 \large
 
-may try to evaluate the first muon from an event with zero muons.
+The latter might try to access the first of zero muons.
 
 \vspace{0.25 cm}
 \begin{uncoverenv}<6->
-Instead,
+\textcolor{darkblue}{Instead,}
 
 \small\begin{minted}{python}
 Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
@@ -518,7 +550,7 @@ Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
 \textcolor{darkblue}{If yes,} great! Continue developing array operations, thinking about their ``ergonomics,'' and optimize their implementations.
 
 \vspace{0.75 cm}
-\textcolor{darkblue}{If no,} it's still a useful abstraction layer, but we'll need a more user-friendly interface on top of it, such as a functional or declarative language that resolves to array operations.
+\textcolor{darkblue}{If no,} it's still a useful abstraction layer, but we'll need a more user-friendly interface on top of it, such as a functional or declarative language.
 \end{minipage}
 \end{center}
 \end{frame}
