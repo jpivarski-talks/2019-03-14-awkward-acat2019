@@ -559,10 +559,43 @@ Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
 \vspace{0.5 cm}
 2 beginning grad students, 1 beginning and 1 advanced postdoc, 1 advanced researcher
 
-\vspace{1.5 cm}
-\begin{center}
-\LARGE QUOTES OR CONCLUSIONS HERE
-\end{center}
+\vspace{0.5 cm}
+Everyone had most experience in C++ (5~years to decades), less in Python, which was primarily PyROOT (6~months to 3--4 years), very little in Numpy (2~to~5 months).
+
+\vspace{0.5 cm}
+
+\begin{onlyenv}<1>
+\textcolor{darkblue}{Some motivated by execution speed, some by ease of use.}
+\small
+\begin{itemize}
+\item ``Thirty minutes is too long to wait for a plot.''
+\item ``Will be run order of a hundred times over the course of the year; this is a big investment.'' but ``For something that could be two times faster, I wouldn't do these optimizations.''
+\item ``Ease of use is paramount; I've always struggled with poorly written code.'' and \\ ``Making it fast to run it again and again is {\it going around} ease of use.''
+\item ``Ease of use is most important, even if execution speed decreases.''
+\end{itemize}
+\vspace{0.5 cm}
+\end{onlyenv}
+
+\begin{onlyenv}<2>
+\textcolor{darkblue}{Some found it easier, some more difficult.}
+\small
+\begin{itemize}
+\item ``Way, way much easier than applying cuts with for loops.''
+\item ``Surprised by how conceptually different you have to think about selections, combining objects.'' but ``Not good or bad, just surprising that it has a learning curve.''
+\item ``Individual problems that have been much more difficult than expected.'' and \\ ``Translating `if' statements is where I get hung up.'' but \\ ``Not inherently harder; just harder now for those of us used to the `for' loop version.''
+\end{itemize}
+\vspace{1 cm}
+\end{onlyenv}
+
+\begin{onlyenv}<3>
+\textcolor{darkblue}{One point came up multiple times: easier to \underline{read} than \underline{write}.}
+\small
+\begin{itemize}
+\item ``The good thing is, once you figure it out, it's clear why it works. It's not magic, you just have to get the mapping right.''
+\item ``If I ask a student to read my code, he'll be able to read it. But five minutes later, he'll try something similar and it won't work.''
+\end{itemize}
+\vspace{2 cm}
+\end{onlyenv}
 \end{frame}
 
 \begin{frame}{Further developments}
@@ -594,6 +627,7 @@ Reimplemented in C++ using xtensor (Numpy clone for C++).
 \vspace{0.5 cm}
 Awkward-array is a library for complex data, presented as arrays. Jagged arrays are the most important for HEP. \textcolor{gray}{(Perhaps the only type {\it necessary} for HEP?)}
 
+
 \vspace{0.5 cm}
 \textcolor{darkblue}{We're beyond single-operation tests; we're implementing complete analyses.}
 
@@ -607,23 +641,3 @@ This is an open area of development with many paths to follow!
 \end{frame}
 
 \end{document}
-
-%% \begin{frame}[fragile]{Common pattern: expand-compute-reduce}
-%% \vspace{0.5 cm}
-
-
-%% Isolating jets from electrons:
-%% \begin{enumerate}
-%% \item consider all jet-electron pairs
-%% \item determine if $\Delta R$ is too small for each
-%% \item reduce by 
-%% \end{enumerate}
-
-%% \small\begin{minted}{python}
-%% pairs = jets.cross(electrons, nested=True)
-%% jets[~(delta_r(pairs.i0, pairs.i1) < 0.5).any()]
-%% \end{minted}
-%% \normalsize
-
-%% ``Take the {\tt \small jets} for which not ({\tt \small \textasciitilde}) any have $\Delta R < 0.5$ with {\tt \small electrons}.''
-%% \end{frame}
