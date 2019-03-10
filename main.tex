@@ -567,24 +567,24 @@ Muons_pt[(nMuons > 0), 0] > 30       # mask first dim, pick 0
 
 \begin{frame}{Further developments}
 \vspace{0.2 cm}
-\begin{itemize}\setlength{\itemsep}{0.2 cm}
-\item<1-> Numba is a JIT-compiler for Python, but it only works on data that can be statically typed. Awkward array types are all known before a big computation, so I'm extending Numba to recognize them and JIT-compile array operations.
+\begin{itemize}\setlength{\itemsep}{0.35 cm}
+\item<1-> Numba is a JIT-compiler for Python, but only for statically typed data.
+
+Awkward-array types are ``statically typed at runtime,'' so I'm extending Numba to recognize and JIT-compile them.
 
 \vspace{0.1 cm}
-This will permit compiled (fast), imperative (for-loop style) calculations in Python.
+\textcolor{darkblue}{This will permit fast (compiled), \underline{imperative} (for-loop style) calculations in Python.}
 
-\item<2-> Possible Google Summer of Code project to add precompiled and/or CUDA implementations, depending on the abilities and interests of the student.
+\item<2-> Possible Google Summer of Code project to add \textcolor{darkblue}{precompiled and/or CUDA} implementations, depending on the abilities and interests of the student.
 
-\item<3-> Michael Hedges (Purdue) is developing Pandas extensions, so that DataFrame columns can contain jagged data and perform efficient jagged operations.
+\item<3-> Michael Hedges (Purdue) is developing \textcolor{darkblue}{Pandas extensions}, so that DataFrame columns can contain and operate on jagged data.
 
-\item<4-> Giuseppe Cerati (Fermilab) is investigating the use of the jagged array concept in reconstruction, using C++.
-
-\vspace{0.1 cm}
-\textcolor{darkblue}{Goal:} single codebase that is efficient on CPUs and GPUs.
+\item<4-> Giuseppe Cerati (Fermilab) is investigating the use of jagged arrays in C++, to write \textcolor{darkblue}{reconstruction algorithms that are equally efficient on CPUs and GPUs.}
 
 \vspace{0.1 cm}
 \textcolor{darkblue}{Status:} implemented track-propagation in Python and switched from CPU to GPU with from ``{\tt \small import numpy as np}'' $\to$ ``{\tt \small import cupy as np}''.
 
+\vspace{0.1 cm}
 Reimplemented in C++ using xtensor (Numpy clone for C++).
 \end{itemize}
 \end{frame}
@@ -595,12 +595,12 @@ Reimplemented in C++ using xtensor (Numpy clone for C++).
 Awkward-array is a library for complex data, presented as arrays. Jagged arrays are the most important for HEP. (Perhaps the only type {\it necessary} for HEP?)
 
 \vspace{0.5 cm}
-We're beyond single-operation tests; we're implementing complete analyses.
+\textcolor{darkblue}{We're beyond single-operation tests; we're implementing complete analyses.}
 
 Performance is within a factor of two of C++, and there's low-hanging fruit for improvements.
 
 \vspace{0.5 cm}
-Physicists' impressions\ldots
+Physicists find it hard to write, but easy to read.
 
 \vspace{0.5 cm}
 This is an open area of development with many paths to follow!
